@@ -1,0 +1,62 @@
+// Create a form field for typing
+var f = this.addField("typingField", "text", 0, [0,0,180,20]);
+
+// Set font size and type
+f.textSize = 12;
+f.textFont = "Arial";
+
+// Set the default value
+f.defaultValue = "Type here";
+
+// Set border style
+f.borderStyle = "border";
+
+// Set the multiline property
+f.multiline = true;
+
+// Set the scrollable property
+f.scroll = true;
+
+// Create a timer
+var startTime = new Date();
+var endTime;
+
+// Disable backspace key
+f.setAction("Keystroke", "event.rc = (event.key != 8);");
+
+// Check grammar and count typing data on blur
+f.setAction("Blur", "checkGrammarAndCountData(this);");
+
+// Function to check grammar and count typing data
+function checkGrammarAndCountData(field) {
+    endTime = new Date();
+    var elapsedTime = (endTime - startTime)/1000;
+    var words = field.value.split(" ").length;
+    var typingSpeed = Math.round(words/elapsedTime * 60);
+    console.println("Typed content: " + field.value);
+    console.println("Words: " + words);
+    console.println("Elapsed time: " + elapsedTime + " seconds");
+    console.println("Typing speed: " + typingSpeed + " words per minute");
+    console.println("Grammar check functionality goes here");
+
+    // Upload txt file and match typed content
+    var typedContent = field.value;
+    var file = this.getPath() + "/typingTest.txt";
+    var fileContent = "";
+    try {
+        fileContent = this.getFileData(file);
+    } catch (e) {
+        console.println("Error uploading file: " + e);
+        return;
+    }
+    var wordsMatched = 0;
+    var fileWords = fileContent.split(" ");
+    var typedWords = typedContent.split(" ");
+    for (var i = 0; i < fileWords.length; i++) {
+        if (typedWords[i] === fileWords[i]) {
+            wordsMatched++;
+        }
+    }
+    console.println("Words matched: " + wordsMatched);
+    console.println("Accuracy: " + (wordsMatched / fileWords.length * 100) + "%");
+}
